@@ -10,7 +10,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=sqlite:///./contracts.db
+      - DATABASE_URL=sqlite:///./tracker.db
 
   frontend:
     build:

@@ -7,11 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 
 class Contract(SQLModel, table=True):
+    __tablename__ = "contract"
+    
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, nullable=False)
     title: str = Field(nullable=False)
     text: str = Field(nullable=False)
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./contracts.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./tracker.db")
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
 app = FastAPI(
@@ -93,6 +95,5 @@ def initialize_database_and_seed():
 def get_contracts(session: Session = Depends(get_db_session)):
     """
     """
-    contracts_query = select(Contract)
-    results = session.exec(contracts_query).all()
+    results = session.exec(select(Contract)).all()
     return results
