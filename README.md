@@ -4,27 +4,30 @@ A lightweight, frontend-focused web application designed to help legal teams tra
 
 # Local Development Setup
 
-Building and running the application components requires minimal local configuration. All backend dependencies are isolated via Docker.
+Building and running the application components requires minimal local configuration. All dependencies are isolated via Docker.
 
 ## Prerequisites
 
 Docker and Docker Compose installed locally.
 
-### Running the Backend Application
+Note: You do not need Node.js, npm, Python, or the Angular CLI installed on your local host machine. Everything runs, compiles, hot-reloads, and links directly inside isolated Docker runtime containers.
+
+### Running the Application
 
 To spin up the Python FastAPI server locally in development mode (with live reload enabled):
 
-1. Navigate to the project root directory.
-2. Run the following command:
+1. Ensure you are at the root directory of the project.
+2. Build and launch both the Angular frontend and FastAPI backend applications simultaneously using Docker Compose:
    
     ```bash
     docker compose up --build
     ```
 
-3. Once the container is healthy, the backend server will be reachable at:
+3. Accessing the Applications:
 
-    - API Base URL: http://localhost:8000
-    - Interactive Swagger UI Documentation: http://localhost:8000/docs
+    - Angular Frontend Interface: http://localhost:4200
+    - FastAPI Backend Service: http://localhost:8000
+    - Interactive API Documentation: http://localhost:8000/docs
 
 Note: The SQLite database file will be automatically initialized and seeded with sample legal documents on the initial container startup.
 
