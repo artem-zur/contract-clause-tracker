@@ -11,3 +11,4 @@ services:
       - ./backend:/app
     environment:
       - ENV=development
+      - DATABASE_URL=sqlite:///./contracts.db

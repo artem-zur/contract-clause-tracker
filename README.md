@@ -8,7 +8,7 @@ Building and running the application components requires minimal local configura
 
 ## Prerequisites
 
-* [Docker](https://docs.docker.com/get-docker/)
+Docker and Docker Compose installed locally.
 
 ### Running the Backend Application
 
@@ -26,11 +26,13 @@ To spin up the Python FastAPI server locally in development mode (with live relo
     - API Base URL: http://localhost:8000
     - Interactive Swagger UI Documentation: http://localhost:8000/docs
 
+Note: The SQLite database file will be automatically initialized and seeded with sample legal documents on the initial container startup.
+
 To stop the running application containers, use:
 
-    ```bash
-    docker compose down
-    ```
+```bash
+docker compose down
+```
 
 # Architecture
 
@@ -47,3 +49,9 @@ Tailwind CSS was chosen as the primary stylesheet system. Utilizing a utility-fi
 ## Backend Framework Selection
 
 Python with FastAPI was selected over traditional alternatives like Flask. Because its automatic Swagger UI document generation significantly reduces testing cycles during frontend-to-backend integration and provides an immediate playground for pair-programming expansions later. Additionally, FastAPI provides out-of-the-box asynchronous route support and rapid JSON serialization.
+
+## Database Strategy
+
+SQLite is used as the relational database engine. It represents the most conservative choice as it introduces zero infrastructural overhead or external container dependencies during local development. 
+
+To guarantee cross-compatibility with enterprise tools like PostgreSQL down the line, database tables are abstracted using an Object Relational Mapper (SQLModel). This ensures that upgrading from local SQLite to cloud-hosted PostgreSQL involves changing only a single environment connection string.
