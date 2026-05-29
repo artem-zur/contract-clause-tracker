@@ -58,3 +58,37 @@ Python with FastAPI was selected over traditional alternatives like Flask. Becau
 SQLite is used as the relational database engine. It represents the most conservative choice as it introduces zero infrastructural overhead or external container dependencies during local development. 
 
 To guarantee cross-compatibility with enterprise tools like PostgreSQL down the line, database tables are abstracted using an Object Relational Mapper (SQLModel). This ensures that upgrading from local SQLite to cloud-hosted PostgreSQL involves changing only a single environment connection string.
+
+## File Uploading & Trade-Offs
+
+To maintain a fast development velocity and keep the codebase highly predictable, a streamlined approach was chosen for handling document ingestion. When a user uploads a document, the frontend transmits it as a standard binary blob wrapped in a FormData payload, which FastAPI intercepts natively.
+
+### In-Database Ingestion vs. File System Storage
+
+The application explicitly avoids persisting uploaded files onto local server storage, cloud blocks, or container file systems. Instead, incoming text streams are parsed in-memory and stored directly within the relational database (contract table) as raw strings.
+
+- **Why this choice was made**: Storing physical files on a server requires managing persistent storage volumes, maintaining strict directory hierarchies, handling file-write collisions, and dealing with OS-specific folder permissions.
+- **The Benefit**: Storing raw text directly in the SQLite database keeps the backend container completely stateless. Database migrations, automated backups, and text queries remain fully unified inside a single engine, completely eliminating file system overhead and state synchronization issues.
+
+### Streamlined Processing and External Dependencies
+
+Because the application strictly restricts file uploads to the `.txt` ecosystem, the extraction pipeline on the backend requires zero external parsing libraries.
+
+Using FastAPI’s asynchronous `UploadFile` type, reading the text stream and translating it into a database-ready format is handled natively in just a few lines of code:
+
+```Python
+content_bytes = await file.read()
+text_content = content_bytes.decode("utf-8")
+```
+
+This offloads presentation and formatting considerations entirely to the frontend consumer layer, ensuring the backend acts as a lightweight data proxy.
+
+### Non-Normalization Trade-Off & Technical Risks
+
+A major architectural shortcut taken in this implementation is the complete omission of text normalization or character sanitization on ingestion. The backend does not attempt to clean, strip, or reformat problematic symbols, trailing spaces, or foreign punctuation rules.
+
+While this drastically simplifies the backend codebase, it introduces explicit trade-offs and structural risks that must be monitored:
+
+- **Risk of Encoding Mismatches**: The backend assumes all uploaded files are strictly formatted in UTF-8. If a user uploads a .txt file encoded in legacy formats (such as Windows-1252 or ISO-8859-1), decoding errors may occur, or the text might save as corrupted text symbols (mojibake).
+- **Special Character Distortion**: Complex legal typography—such as paragraph hooks (§), section signs, curly smart-quotes, or em-dashes—are preserved in their raw format. Without backend normalization, the system relies entirely on the frontend application's font-family configurations and HTML escaping rules to render these glyphs correctly without breaking the user interface layout.
+- **Lack of Data Deduplication**: Uploading the exact same document multiple times will create duplicate records under identical names in the database, as the system does not compare raw string footprints on ingest.

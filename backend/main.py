@@ -1,14 +1,13 @@
 import uuid
 import os
 from typing import List
-from xml.dom.minidom import Document
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, status, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 
 class Contract(SQLModel, table=True):
     __tablename__ = "contract"
-    
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, nullable=False)
     title: str = Field(nullable=False)
     text: str = Field(nullable=False)
@@ -94,6 +93,53 @@ def initialize_database_and_seed():
 @app.get("/contracts", response_model=List[Contract], status_code=200)
 def get_contracts(session: Session = Depends(get_db_session)):
     """
+    Retrieves all contracts from the database.
     """
     results = session.exec(select(Contract)).all()
     return results
+
+@app.post("/contracts", status_code=status.HTTP_201_CREATED)
+async def upload_contract(
+    file: UploadFile = File(...), 
+    session: Session = Depends(get_db_session)
+):
+    """
+    Accepts a .txt file, extracts its content, and saves it to the database 
+    using the file name as the contract title.
+    """
+    # Restrict to .txt files only
+    if not file.filename.endswith('.txt'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file extension. Only '.txt' files are permitted."
+        )
+    
+    try:
+        # Read and decode the raw text content
+        content_bytes = await file.read()
+        text_content = content_bytes.decode("utf-8")
+        
+        # Create and persist the database record
+        new_contract = Contract(
+            title=file.filename,
+            text=text_content
+        )
+        
+        session.add(new_contract)
+        session.commit()
+        session.refresh(new_contract)
+        
+        # Return a meaningful success response
+        return {
+            "success": True,
+            "message": f"File '{file.filename}' was saved successfully.",
+            "contract_id": str(new_contract.id)
+        }
+        
+    except Exception as e:
+        # Rollback the transaction in case of database glitches
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred while processing and saving the file: {str(e)}"
+        )
