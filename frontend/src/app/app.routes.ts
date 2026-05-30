@@ -6,7 +6,10 @@ export const routes: Routes = [
     path: '', 
     component: Dashboard 
   },
-  // TODO: Add a route for the contract view component, e.g. { path: 'contracts/:id', component: ContractView }
+  { 
+    path: 'contract/:id', 
+    loadComponent: () => import('./contract-view').then(m => m.ContractView) 
+  },
   { 
     path: '**', 
     redirectTo: '' 

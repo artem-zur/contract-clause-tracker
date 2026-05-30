@@ -1,0 +1,34 @@
+@if (isLoading()) {
+
+    <div class="flex flex-col items-center justify-center p-24 bg-white rounded-xl border border-slate-200 shadow-sm min-h-[400px]">
+        <mat-spinner diameter="40" strokeWidth="3" class="!text-teal-600"></mat-spinner>
+        <p class="text-sm text-slate-500 mt-4 font-medium animate-pulse">Streaming raw contractual assets...</p>
+    </div>
+
+} @else {
+
+    @if (contract()) {
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+            
+            <div class="lg:col-span-3 bg-white rounded-xl border border-slate-200 shadow-sm p-8 min-h-[600px]">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h1 class="text-xl font-bold text-slate-900">{{ contract()?.title }}</h1>
+                    <p class="text-xs text-slate-400 mt-1">Ingested tracking index: {{ contract()?.id }}</p>
+                </div>
+                <div class="font-mono text-sm leading-relaxed text-slate-800 bg-slate-50/50 rounded-lg p-6 border border-slate-100 whitespace-pre-wrap select-text selection:bg-teal-100">
+                    {{ contract()?.text }}
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sticky top-24">
+                <h2 class="text-sm font-semibold text-slate-900 tracking-wider uppercase mb-4">Labeled Clauses</h2>
+                
+                <div class="flex flex-col gap-2.5"></div>
+            </div>
+
+        </div>
+    
+    }
+
+}

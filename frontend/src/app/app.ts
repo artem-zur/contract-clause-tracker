@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [
     RouterOutlet,
+    RouterModule,
     MatIconModule,
     MatButtonModule,
   ],

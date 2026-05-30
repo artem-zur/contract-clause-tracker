@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { Contract, ContractClient } from '../contract-client';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,6 +25,7 @@ import { Contract, ContractClient } from '../contract-client';
 })
 export class Dashboard implements OnInit {
   private readonly contractClient = inject(ContractClient);
+  private readonly router = inject(Router);
 
   // Columns tracking structural table layouts
   readonly displayedColumns: string[] = ['name', 'clauses'];
@@ -76,10 +78,8 @@ export class Dashboard implements OnInit {
         }
       });
   }
-
-  // TODO: Interactive handler placeholder for future routing implementation
+  
   onRowClick(row: Contract): void {
-    console.log(`Navigating to document inspection views for ID: ${row.id} (${row.title})`);
-    // TODO: this.router.navigate(['/contract', row.id]);
+    this.router.navigate(['/contract', row.id]);
   }
 }
