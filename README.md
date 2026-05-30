@@ -92,3 +92,23 @@ While this drastically simplifies the backend codebase, it introduces explicit t
 - **Risk of Encoding Mismatches**: The backend assumes all uploaded files are strictly formatted in UTF-8. If a user uploads a .txt file encoded in legacy formats (such as Windows-1252 or ISO-8859-1), decoding errors may occur, or the text might save as corrupted text symbols (mojibake).
 - **Special Character Distortion**: Complex legal typography—such as paragraph hooks (§), section signs, curly smart-quotes, or em-dashes—are preserved in their raw format. Without backend normalization, the system relies entirely on the frontend application's font-family configurations and HTML escaping rules to render these glyphs correctly without breaking the user interface layout.
 - **Lack of Data Deduplication**: Uploading the exact same document multiple times will create duplicate records under identical names in the database, as the system does not compare raw string footprints on ingest.
+
+## Search Strategy & Scalability Trade-Offs
+
+To maintain a frontend-focused velocity, the initial implementation executes search queries entirely on the client side using Angular Material's built-in `MatTableDataSource` filtering engine. While this provides instantaneous results without server round-trips for small datasets, it introduces a critical scalability ceiling.
+
+### The Limits of Client-Side Filtering
+
+As the database grows, this approach exposes major technical trade-offs:
+
+- **The Pagination Blocker**: The core architectural flaw of frontend filtering is its inability to coexist with backend pagination (`LIMIT/OFFSET`). If the backend API restricts responses to paginated chunks (e.g., 20 contracts per page), a frontend search can only filter the 20 records currently sitting in browser memory. It becomes completely blind to matching records residing on un-fetched pages.
+- **Network and Memory Bloat**: To keep a client-side search accurate *without* pagination, the application would be forced to stream the entire contract index—including heavy raw text data—across the network to the browser on initial load. This leads to massive payload sizes and heavy browser memory consumption as the document catalog scales.
+- **CPU Bottlenecks**: Executing continuous string matching routines across large multi-megabyte datasets scales poorly inside a single-threaded browser environment compared to optimized database indexing engines.
+
+### The Superior Alternative: Backend-Driven Queries
+
+For enterprise or production readiness, this search strategy should be refactored into a **backend-driven, server-paginated pipeline**:
+
+1. **Database-Level Execution**: The frontend search input should trigger an API call to an endpoint like `GET /contracts?search=query&page=1&size=20`. 
+2. **Pragmatic Backend Integration**: The FastAPI backend would capture this query parameter and execute a structured relational query utilizing a `SQL LIKE %query%` operation (or a native case-insensitive `contains` clause via SQLModel) against the `Contract.title` and `Contract.text` columns.
+3. **Advanced Growth Path**: Down the line, this structure easily upgrades to leverage PostgreSQL's native Full-Text Search (FTS) vectors or external indexing engines like Elasticsearch without requiring any structural changes to the frontend state management.
