@@ -1,4 +1,4 @@
-import { Component, signal, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, signal, inject, ViewChild, ElementRef, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -24,6 +24,8 @@ export class Upload {
   private snackBar = inject(MatSnackBar);
 
   readonly isUploading = signal<boolean>(false);
+
+  readonly uploaded = output<void>();
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -68,7 +70,7 @@ export class Upload {
       .subscribe({
         next: () => {
           this.showNotification('Contract uploaded and processed successfully');
-          // TODO: Contextual hooks for reloading lists can be added here
+          this.uploaded.emit();
         },
         error: (err) => {
           console.error('Contract upload failure:', err);

@@ -10,7 +10,7 @@
 <div class="min-h-screen bg-[#f8fafc] text-[#0f172a] font-sans antialiased">
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <app-upload></app-upload>
+    <app-upload (uploaded)="loadContracts()"></app-upload>
 
     <div class="mt-8 mb-4 flex items-center justify-between">
       <div>
