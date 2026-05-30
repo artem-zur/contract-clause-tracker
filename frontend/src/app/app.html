@@ -1,8 +1,16 @@
 <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">C</div>
-      <span class="text-xl font-semibold tracking-tight text-[#0f172a]">Contract Clause Tracker</span>
+    <div class="flex items-center gap-4">
+      @if (!isHomePage()) {
+        <button mat-icon-button routerLink="/" class="!inline-flex">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      }
+
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">C</div>
+        <span class="text-xl font-semibold tracking-tight text-[#0f172a]">Contract Clause Tracker</span>
+      </div>
     </div>
   </div>
 </header>
@@ -57,7 +65,7 @@
                       Termination
                     </span>
                   } @else {
-                    <span class="text-xs text-slate-400 italic">No clauses identified</span>
+                    <span class="text-xs text-slate-400 italic">No clauses labeled</span>
                   }
                 </div>
               </td>
@@ -86,3 +94,5 @@
     }
   </main>
 </div>
+
+<router-outlet></router-outlet>

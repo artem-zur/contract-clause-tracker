@@ -8,11 +8,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Contract, ContractClient } from './contract-client';
 import { finalize } from 'rxjs/internal/operators/finalize';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
+    RouterOutlet,
     Upload,
     CommonModule,
     MatTableModule,
@@ -25,6 +29,7 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 })
 export class App implements OnInit {
   private readonly contractClient = inject(ContractClient);
+  private readonly router = inject(Router);
 
   // Columns tracking structural table layouts
   readonly displayedColumns: string[] = ['name', 'clauses'];
@@ -82,5 +87,26 @@ export class App implements OnInit {
   // TODO: Interactive handler placeholder for future routing implementation
   onRowClick(row: Contract): void {
     console.log(`Navigating to document inspection views for ID: ${row.id} (${row.title})`);
+    // TODO: this.router.navigate(['/contract', row.id]);
   }
+
+  isHomePage = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map(() => this.router.isActive('/', {
+        paths: 'exact',
+        queryParams: 'ignored',
+        fragment: 'ignored',
+        matrixParams: 'ignored'
+      }))
+    ),
+    { 
+      initialValue: this.router.isActive('/', {
+        paths: 'exact',
+        queryParams: 'ignored',
+        fragment: 'ignored',
+        matrixParams: 'ignored'
+      })
+    }
+  );
 }
