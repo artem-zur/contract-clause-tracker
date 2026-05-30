@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 import os
 from typing import List
@@ -91,10 +92,13 @@ def initialize_database_and_seed():
             session.commit()
 
 @app.get("/contracts", response_model=List[Contract], status_code=200)
-def get_contracts(session: Session = Depends(get_db_session)):
+async def get_contracts(session: Session = Depends(get_db_session)):
     """
     Retrieves all contracts from the database.
     """
+    # Simulate a 2.5-second server latency/loading time
+    await asyncio.sleep(2.5)
+
     results = session.exec(select(Contract)).all()
     return results
 
@@ -115,6 +119,9 @@ async def upload_contract(
         )
     
     try:
+        # Simulate heavy document analysis/parsing
+        await asyncio.sleep(2.5)
+
         # Read and decode the raw text content
         content_bytes = await file.read()
         text_content = content_bytes.decode("utf-8")
