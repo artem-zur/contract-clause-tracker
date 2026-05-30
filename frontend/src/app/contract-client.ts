@@ -28,6 +28,13 @@ export class ContractClient {
   }
 
   /**
+   * Fetches specific contract structural details including body text by ID
+   */
+  getById(id: string): Observable<Contract> {
+    return this.http.get<Contract>(`${this.baseUrl}/contracts/${id}`);
+  }
+
+  /**
    * Uploads a raw .txt contract file to the backend
    * @param file The text file selected by the user
    */

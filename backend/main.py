@@ -103,6 +103,28 @@ async def get_contracts(session: Session = Depends(get_db_session)):
     results = session.exec(select(Contract)).all()
     return results
 
+@app.get("/contracts/{contract_id}", response_model=Contract, status_code=status.HTTP_200_OK)
+async def get_contract_by_id(
+    contract_id: uuid.UUID, 
+    session: Session = Depends(get_db_session)
+):
+    """
+    Retrieves a targeted contract document record by its unique primary key ID.
+    """
+
+    # Simulate a 2.5-second server latency matching the UI loading experience
+    await asyncio.sleep(2.5)
+
+    contract = session.get(Contract, contract_id)
+    
+    if not contract:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Contract with ID '{contract_id}' could not be located in database storage."
+        )
+        
+    return contract
+
 @app.post("/contracts", status_code=status.HTTP_201_CREATED)
 async def upload_contract(
     file: UploadFile = File(...), 
