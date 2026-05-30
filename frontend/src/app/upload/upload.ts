@@ -89,7 +89,7 @@ export class Upload {
 
     this.snackBar.open(fullMessage, 'Dismiss', {
       duration: isError ? 5000 : 3500,
-      horizontalPosition: 'end',
+      horizontalPosition: 'center',
       verticalPosition: 'bottom',
     });
   }

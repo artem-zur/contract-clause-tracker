@@ -1,12 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AppRuntimeConfigClient } from './app-runtime-config-client';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContractClient {
   private http = inject(HttpClient);
+  private readonly runtimeConfigClient = inject(AppRuntimeConfigClient);
+
+  private get baseUrl(): string {
+    return this.runtimeConfigClient.apiBaseUrl();
+  }
 
   /**
    * Uploads a raw .txt contract file to the backend
@@ -17,6 +23,6 @@ export class ContractClient {
     // Appending the file as a blob payload matching standard multi-part data expectations
     formData.append('file', file, file.name);
 
-    return this.http.post('http://localhost:8000/contracts', formData);
+    return this.http.post(`${this.baseUrl}/contracts`, formData);
   }
 }
