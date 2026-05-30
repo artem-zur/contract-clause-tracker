@@ -1,8 +1,88 @@
-<main class="max-w-4xl mx-auto mt-6">
-  <header class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Contract Clause Tracker</h1>
-    <p class="text-sm text-slate-500">Manage, slice, and verify legal frameworks dynamically.</p>
-  </header>
+<header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">C</div>
+      <span class="text-xl font-semibold tracking-tight text-[#0f172a]">Contract Clause Tracker</span>
+    </div>
+  </div>
+</header>
 
-  <app-upload></app-upload>
-</main>
+<div class="min-h-screen bg-[#f8fafc] text-[#0f172a] font-sans antialiased">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <app-upload></app-upload>
+
+    <div class="mt-8 mb-4 flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Tracked Contracts</h2>
+        <p class="text-sm text-slate-500">Review contract ingestion state and clause categorization status.</p>
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      
+      <div class="flex flex-col items-center justify-center p-12 bg-white rounded-xl border border-slate-200 shadow-sm min-h-[300px]">
+        <mat-spinner diameter="40" strokeWidth="3" class="!text-teal-600"></mat-spinner>
+        <p class="text-sm text-slate-500 mt-4 font-medium animate-pulse">Analyzing contract structures...</p>
+      </div>
+    
+    } @else {
+
+      @if (contracts().length > 0) {
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <table mat-table [dataSource]="dataSource" matSort class="w-full">
+            
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="!bg-slate-50 !text-slate-700 !font-semibold !text-xs !uppercase !tracking-wider"> Title </th>
+              <td mat-cell *matCellDef="let contract" class="!py-4 font-medium text-slate-900 flex items-center gap-2">
+                <mat-icon class="text-slate-400 text-sm scale-90">description</mat-icon>
+                {{ contract.title }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="clauses">
+              <th mat-header-cell *matHeaderCellDef class="!bg-slate-50 !text-slate-700 !font-semibold !text-xs !uppercase !tracking-wider"> Labeled Clauses </th>
+              <td mat-cell *matCellDef="let contract" class="!py-4">
+                <div class="flex flex-wrap gap-1.5" (click)="$event.stopPropagation()">
+                  @if (contract.title === 'Mutual Non-Disclosure Agreement') {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-600/10">
+                      NDA
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10">
+                      Liability
+                    </span>
+                  } @else if (contract.title === 'Master Services Provision Agreement') {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/10">
+                      Termination
+                    </span>
+                  } @else {
+                    <span class="text-xs text-slate-400 italic">No clauses identified</span>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                (click)="onRowClick(row)"
+                class="hover:bg-slate-50/80 cursor-pointer transition-colors duration-150">
+            </tr>
+          </table>
+        </div>
+
+      } @else {
+      
+        <div class="flex flex-col items-center justify-center p-16 text-center bg-white rounded-xl border border-slate-200 shadow-sm min-h-[300px]">
+          <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 mb-4 border border-slate-100">
+            <mat-icon>folder_open</mat-icon>
+          </div>
+          <h3 class="text-base font-semibold text-slate-900">No contracts available</h3>
+          <p class="text-sm text-slate-500 max-w-sm mt-1 mx-auto">Get started by uploading your first contract file above to analyze and parse legal clauses automatically.</p>
+        </div>
+      
+      }
+
+    }
+  </main>
+</div>

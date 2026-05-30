@@ -3,6 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AppRuntimeConfigClient } from './app-runtime-config-client';
 
+export interface Contract {
+  id: string;
+  title: string;
+  text: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -12,6 +18,13 @@ export class ContractClient {
 
   private get baseUrl(): string {
     return this.runtimeConfigClient.apiBaseUrl();
+  }
+
+  /**
+   * Fetches all contracts
+   */
+  getAll(): Observable<Contract[]> {
+    return this.http.get<Contract[]>(`${this.baseUrl}/contracts`);
   }
 
   /**
