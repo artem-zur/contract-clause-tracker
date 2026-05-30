@@ -78,7 +78,12 @@ export class Dashboard implements OnInit {
         }
       });
   }
-  
+
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
   onRowClick(row: Contract): void {
     this.router.navigate(['/contract', row.id]);
   }
