@@ -16,15 +16,46 @@
                     <h1 class="text-xl font-bold text-slate-900">{{ contract()?.title }}</h1>
                     <p class="text-xs text-slate-400 mt-1">Ingested tracking index: {{ contract()?.id }}</p>
                 </div>
+                
                 <div class="font-mono text-sm leading-relaxed text-slate-800 bg-slate-50/50 rounded-lg p-6 border border-slate-100 whitespace-pre-wrap select-text selection:bg-teal-100">
-                    {{ contract()?.text }}
+                    @for (segment of contractSegments(); track $index) {
+                        @if (segment.isHighlighted) {
+                            <span [ngClass]="segment.styleClass" 
+                                  class="px-1.5 py-0.5 rounded border font-medium cursor-help transition-all duration-150 selection:bg-transparent"
+                                  [title]="segment.clause?.clauseType?.name">
+                                {{ segment.text }}
+                            </span>
+                        } @else {
+                            {{ segment.text }}
+                        }
+                    }
                 </div>
             </div>
 
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sticky top-24">
-                <h2 class="text-sm font-semibold text-slate-900 tracking-wider uppercase mb-4">Labeled Clauses</h2>
+                <h2 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4">Labeled Clauses Summary</h2>
                 
-                <div class="flex flex-col gap-2.5"></div>
+                <div class="flex flex-col gap-3">
+                    @for (clause of contract()?.clauses; track clause.id) {
+
+                        <div class="p-3.5 rounded-lg border text-xs leading-normal transition-colors"
+                             [ngClass]="clause.clauseType?.code | clauseStyle">
+                            <div class="font-bold uppercase tracking-wider text-[10px] mb-1.5 flex items-center gap-1.5 opacity-90">
+                                <mat-icon class="scale-75 !w-3.5 !h-3.5 flex items-center justify-center !text-current">gavel</mat-icon>
+                                {{ clause.clauseType?.name }}
+                            </div>
+                            <p class="text-slate-700 italic">"{{ clause.textSnippet }}"</p>
+                        </div>
+                    
+                    } @empty {
+                    
+                        <div class="text-center py-8 border border-dashed border-slate-200 rounded-lg bg-slate-50/50">
+                            <mat-icon class="text-slate-300 mb-1 scale-90">gavel</mat-icon>
+                            <p class="text-xs text-slate-400 font-medium">No tracked clauses detected</p>
+                        </div>
+                    
+                    }
+                </div>
             </div>
 
         </div>

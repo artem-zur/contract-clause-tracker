@@ -46,9 +46,9 @@
                     <td mat-cell *matCellDef="let contract" class="!py-4">
 
                         <div class="flex flex-wrap gap-1.5" (click)="$event.stopPropagation()">
-                            @for (clause of getUniqueClauses(contract.clauses); track clause.id) {
+                            @for (clause of contract.clauses | uniqueClauses; track clause.id) {
                                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md ring-1 ring-inset"
-                                    [ngClass]="getClauseStyle(clause.clauseType?.code)"> {{ clause.clauseType?.name }} </span>
+                                    [ngClass]="clause.clauseType?.code | clauseStyle"> {{ clause.clauseType?.name }} </span>
                             } @empty {
                                 <span class="text-xs text-slate-400 italic">No clauses labeled</span>
                             }
