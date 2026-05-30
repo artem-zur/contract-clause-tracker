@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
-import { ContractClient } from '../contract-client';
+import { ContractClient } from '../../contract-client';
 import { finalize } from 'rxjs/operators';
 
 @Component({
