@@ -1,14 +1,21 @@
 import { Component, effect, inject, OnInit, signal, viewChild } from '@angular/core';
 import { Upload } from './upload/upload';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { Contract, ContractClient } from '../contract-client';
+import { Clause, ClauseTypeCode, Contract, ContractClient } from '../contract-client';
 import { Router } from '@angular/router';
+
+const CLAUSE_STYLE_MAP: Record<ClauseTypeCode | 'default', string> = {
+  [ClauseTypeCode.LimitationOfLiability]: 'bg-amber-50 text-amber-700 ring-amber-600/10',
+  [ClauseTypeCode.TerminationForConvenience]: 'bg-rose-50 text-rose-700 ring-rose-600/10',
+  [ClauseTypeCode.NonCompete]: 'bg-teal-50 text-teal-700 ring-teal-600/10',
+  'default': 'bg-slate-50 text-slate-700 ring-slate-600/10'
+};
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +26,8 @@ import { Router } from '@angular/router';
     MatSortModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    NgClass
   ],
   templateUrl: './dashboard.html',
 })
@@ -86,5 +94,26 @@ export class Dashboard implements OnInit {
 
   onRowClick(row: Contract): void {
     this.router.navigate(['/contract', row.id]);
+  }
+
+  getUniqueClauses(clauses: Clause[] | undefined): Clause[] {
+    if (!clauses || clauses.length === 0) return [];
+    
+    const seen = new Set<string>();
+
+    return clauses.filter(clause => {
+      const code = clause.clauseType?.code;
+      
+      if (!code || seen.has(code)) return false;
+      seen.add(code);
+
+      return true;
+    });
+  }
+
+  getClauseStyle(code: string | undefined): string {
+    if (!code) return CLAUSE_STYLE_MAP['default'];
+    
+    return CLAUSE_STYLE_MAP[code as ClauseTypeCode] || CLAUSE_STYLE_MAP['default'];
   }
 }
